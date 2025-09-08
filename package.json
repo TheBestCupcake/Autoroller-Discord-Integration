@@ -1,0 +1,24 @@
+{
+  "name": "autoroller",
+  "version": "1.0.0",
+  "description": "Autoroller is a simple script made for mass rolling dice in DnD.\r This was made for my own personal use as a DM and certain player builds (necromancer) to speed up combat.",
+  "main": "mainApp.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheBestCupcake/Autoroller.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/TheBestCupcake/Autoroller/issues"
+  },
+  "homepage": "https://github.com/TheBestCupcake/Autoroller#readme",
+  "dependencies": {
+    "discord.js": "^14.22.1"
+  }
+}
