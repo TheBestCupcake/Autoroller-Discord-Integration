@@ -22,6 +22,7 @@ for(const folder of commandFolder){
         const filePath = path.join(commandsPath, file);
         const command = require(filePath);
 
+        //Adds command to the Collection if it is valid.
         if('data' in command && 'execute' in command){
             client.commands.set(command.data.name, command);
         }
@@ -30,6 +31,27 @@ for(const folder of commandFolder){
         }
     }
 }
+
+
+//Parses through and finds all events.
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith('.js'));
+
+for(const file of eventFiles){
+    const filePath = path.join(eventsPath, file);
+    const event = require(filePath);
+    //Runs the 'once' events a single time and leaves the others to be constantly active.
+    if(event.once){
+        client.once(event.name, (...args) => event.execute(...args));
+    }
+    else{
+        client.on(event.name, (...args) => event.execute(...args));
+    }
+}
+
+
+
+
 
 //Logs client in as the bot.
 client.login(token);
