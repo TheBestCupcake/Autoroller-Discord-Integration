@@ -7,14 +7,7 @@ const {token} = require('./config.json');
 //New client instance.
 const client = new Client({intents: [GatewayIntentBits.Guilds]});
 
-//Check if client is running properly.
-client.once(Events.ClientReady, (readyClient) => {
-    console.log(`Logged in as ${readyClient.user.tag}`);
-});
-//Logs client in as the bot.
-client.login(token);
-
-
+//Parses through the commands file to register them all to this collection. This is serverside.
 client.commands = new Collection(); 
 
 //Finds each command file.
@@ -38,35 +31,5 @@ for(const folder of commandFolder){
     }
 }
 
-
-//Executes any interactions. Also returns errors if wrong. This is only for slash command interactions.
-client.on(Events.InteractionCreate, async (interaction) => {
-	if (!interaction.isChatInputCommand()) return; 
-	
-    const command = interaction.client.commands.get(interaction.commandName);
-
-    if(!command){
-        console.error(`Command ${command} does not exist.`);
-        return;
-    }
-
-    try{
-        await command.execute(interaction);
-    }
-    catch(error){
-        console.error(error);
-        if(interaction.replied || interaction.deferred){
-            await interaction.followUp({
-				content: 'There was an error while executing this command!',
-				flags: MessageFlags.Ephemeral,
-			});
-        }
-        else{
-            await interaction.reply({
-				content: 'There was an error while executing this command!',
-				flags: MessageFlags.Ephemeral,
-			});
-        }
-    }
-
-});
+//Logs client in as the bot.
+client.login(token);
