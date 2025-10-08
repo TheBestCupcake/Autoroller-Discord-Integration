@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const {Client, Events, GatewayIntentBits, MessageFlags} = require('discord.js');
+const {Client, Collection, Events, GatewayIntentBits, MessageFlags} = require('discord.js');
 const {token} = require('./config.json');
 
 //New client instance.
@@ -15,8 +15,7 @@ client.once(Events.ClientReady, (readyClient) => {
 client.login(token);
 
 
-
-client.commands = new Collection();
+client.commands = new Collection(); 
 
 //Finds each command file.
 const foldersPath = path.join(__dirname, `commands`);
@@ -31,10 +30,43 @@ for(const folder of commandFolder){
         const command = require(filePath);
 
         if('data' in command && 'execute' in command){
-            client.command.set(command.data.name, command);
+            client.commands.set(command.data.name, command);
         }
         else {
             console.log(`[Warning] The command at ${filePath} is missing properties.`);
         }
     }
 }
+
+
+//Executes any interactions. Also returns errors if wrong.
+client.on(Events.InteractionCreate, async (interaction) => {
+	if (!interaction.isChatInputCommand()) return; 
+	
+    const command = interaction.client.commands.get(interaction.commandName);
+
+    if(!command){
+        console.error(`Command ${command} does not exist.`);
+        return;
+    }
+
+    try{
+        await command.execute(interaction);
+    }
+    catch(error){
+        console.error(error);
+        if(interaction.replied || interaction.deferred){
+            await interaction.followUp({
+				content: 'There was an error while executing this command!',
+				flags: MessageFlags.Ephemeral,
+			});
+        }
+        else{
+            await interaction.reply({
+				content: 'There was an error while executing this command!',
+				flags: MessageFlags.Ephemeral,
+			});
+        }
+    }
+
+});
