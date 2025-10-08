@@ -6,8 +6,8 @@ module.exports = {
     .setDescription('Reloads commands.')
     .addStringOption((option) => option.setName('command').setDescription('The command to reload').setRequired(true)),
     async execute(interaction){
-        const commandName = interaction.option.getString('command', true).toLowerCase();
-        const command = interaction.client.comamnds.get(commandName);
+        const commandName = interaction.options.getString('command', true).toLowerCase();
+        const command = interaction.client.commands.get(commandName);
 
         if(!command){
             return interaction.reply("Command does not exist.");
