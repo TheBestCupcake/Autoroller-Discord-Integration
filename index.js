@@ -39,7 +39,7 @@ for(const folder of commandFolder){
 }
 
 
-//Executes any interactions. Also returns errors if wrong.
+//Executes any interactions. Also returns errors if wrong. This is only for slash command interactions.
 client.on(Events.InteractionCreate, async (interaction) => {
 	if (!interaction.isChatInputCommand()) return; 
 	
