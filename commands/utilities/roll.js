@@ -1,27 +1,37 @@
-const {ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder, UserSelectMenuBuilder, MessageFlags, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SlashCommandBuilder} = require('discord.js');
+const {ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder, MessageFlags, SlashCommandBuilder, InteractionCollector, ModalBuilder, TextInputBuilder, TextInputStyle, Message} = require('discord.js');
 const { response } = require('express');
 
 module.exports = {
     data: new SlashCommandBuilder().setName('roll').setDescription('Rolls your dice.'),
 	async execute(interaction) {
 
-		const container = new ContainerBuilder()
-		.setAccentColor(0x0099ff)
-		.addTextDisplayComponents((textDisplay) =>
-			textDisplay.setContent(
-				"Text Inside the text container."
-			),
-		)
-		.addActionRowComponents((actionRow) =>
-			actionRow.setComponents(new UserSelectMenuBuilder().setCustomId('exampleSelect').setPlaceholder('Select users')),
-		)
-		.addSeparatorComponents((separator) => separator)
+		//Modal.
+		const autoModal = new ModalBuilder().setCustomId("autorollerModal").setTitle("Autoroller");
+
+		//Components.
+		const numOfAttacksInput = new TextInputBuilder()
+		.setCustomId("numAtkInput")
+		.setLabel("Enter Number of Attacks.")
+		.setStyle(TextInputStyle.Short);
+		const numOfAttacksRow = new ActionRowBuilder().addComponents(numOfAttacksInput);
+
+		const acToBeatInput = new TextInputBuilder()
+		.setCustomId("acInput")
+		.setLabel("Enter Enemy AC.")
+		.setStyle(TextInputStyle.Short);
+		const acToBeatRow = new ActionRowBuilder().addComponents(acToBeatInput);
 
 
 
-		await interaction.reply({
-			components: [container],
-			flags: MessageFlags.IsComponentsV2,
-		});
+
+
+		autoModal.addComponents(numOfAttacksRow, acToBeatRow);
+
+
+		console.log(autoModal.toJSON());
+
+
+		await interaction.showModal(autoModal);
+
 	},
 };
