@@ -21,11 +21,29 @@ module.exports = {
 		.setStyle(TextInputStyle.Short);
 		const acToBeatRow = new ActionRowBuilder().addComponents(acToBeatInput);
 
+		const attackMod = new TextInputBuilder()
+		.setCustomId("atkMod")
+		.setLabel("Enter Attack Modifier.")
+		.setStyle(TextInputStyle.Short);
+		const attackModRow = new ActionRowBuilder().addComponents(attackMod);
+
+		const damageMod = new TextInputBuilder()
+		.setCustomId("dmgMod")
+		.setLabel("Enter Damage Modifier.")
+		.setStyle(TextInputStyle.Short);
+		const damageModRow = new ActionRowBuilder().addComponents(damageMod);
+
+		const diceSize = new TextInputBuilder()
+		.setCustomId("diceSize")
+		.setLabel("Enter Dice Size.")
+		.setStyle(TextInputStyle.Short);
+		const diceSizeRow = new ActionRowBuilder().addComponents(diceSize);
 
 
 
 
-		autoModal.addComponents(numOfAttacksRow, acToBeatRow);
+
+		autoModal.addComponents(numOfAttacksRow, acToBeatRow, attackModRow, damageModRow, diceSizeRow);
 
 
 		console.log(autoModal.toJSON());
