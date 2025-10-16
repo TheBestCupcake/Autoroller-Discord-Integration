@@ -60,4 +60,4 @@ if __name__ == "__main__":
         "crits": result[2],
         "hits": result[3],
         "misses": result[4]
-    }))
+    }), flush=True)

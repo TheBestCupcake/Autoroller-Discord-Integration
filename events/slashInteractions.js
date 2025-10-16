@@ -14,40 +14,60 @@ module.exports = {
 					const dmgMod = interaction.fields.getTextInputValue('dmgMod');
 					const diceSize = interaction.fields.getTextInputValue('diceSize');
 
+                    
+                    await interaction.deferReply();
+
+                    const scriptPath = path.join(__dirname, '..', 'server-side-logic', 'autoroller.py');
+
+
+                    console.log("before path.")
                     //Autoroller logic.
-                    const python = spawn('python', [path.join(__dirname, 'autoroller.py'),
-                        'autoroller.py',
+                    const python = spawn('python', [scriptPath,
                         numAtk,
                         ac,
                         atkMod,
                         dmgMod,
                         diceSize
                     ]);
+                    console.log("Reached after path.")
 
-                    let result = '';
+                    let stdoutData = '';
+                    let stderrData = '';
+
                     python.stdout.on('data', (data) => {
-                        result += data.toString();
+                        stdoutData += data.toString();
                     });
 
                     python.stderr.on('data', (data) => {
-                        console.error(`Python error: ${data}`);
+                        stderrData += data.toString();
                     });
 
-
-                    
-
-                    //Reply
                     python.on('close', async (code) => {
-                        try {
-                            const parsed = JSON.parse(result);
-                            const reply = `🎯 **Auto Roller Results** 🎲\n${parsed.output}\n\n**Total Damage:** ${parsed.totalDamage}\n**Crits:** ${parsed.crits}\n**Hits:** ${parsed.hits}\n**Misses:** ${parsed.misses}`;
+                        if (stderrData) {
+                            console.error(`Python error: ${stderrData}`);
+                            await interaction.editReply({ content: `⚠️ Python error:\n${stderrData}` });
+                            return;
+                        }
 
-                            await interaction.reply({ content: reply });
+                        try {
+                            // Trim any stray whitespace before parsing
+                            const parsed = JSON.parse(stdoutData.trim());
+                            const reply = `🎯 **Auto Roller Results** 🎲
+**Total Damage:** ${parsed.totalDamage}
+**Crits:** ${parsed.crits}
+**Hits:** ${parsed.hits}
+**Misses:** ${parsed.misses}`;
+
+                            interaction.editReply({ content: reply });
+                            return;
                         } catch (err) {
                             console.error("Failed to parse Python output:", err);
-                            await interaction.reply({ content: "Error running autoroller." });
+                            console.log("Raw Python output:", stdoutData);
+                            interaction.editReply({ content: "❌ Failed to parse Python output. Check console for details." });
+                            return;
                         }
                     });
+                    break;
                 }
             }
         }
