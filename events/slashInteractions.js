@@ -1,4 +1,6 @@
 const { Events, MessageFlags } = require('discord.js');
+const path = require('path');
+const { spawn } = require('child_process');
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -13,9 +15,39 @@ module.exports = {
 					const diceSize = interaction.fields.getTextInputValue('diceSize');
 
                     //Autoroller logic.
+                    const python = spawn('python', [path.join(__dirname, 'autoroller.py'),
+                        'autoroller.py',
+                        numAtk,
+                        ac,
+                        atkMod,
+                        dmgMod,
+                        diceSize
+                    ]);
+
+                    let result = '';
+                    python.stdout.on('data', (data) => {
+                        result += data.toString();
+                    });
+
+                    python.stderr.on('data', (data) => {
+                        console.error(`Python error: ${data}`);
+                    });
+
+
+                    
 
                     //Reply
-                    await interaction.reply({content: "autoroller results here."})
+                    python.on('close', async (code) => {
+                        try {
+                            const parsed = JSON.parse(result);
+                            const reply = `🎯 **Auto Roller Results** 🎲\n${parsed.output}\n\n**Total Damage:** ${parsed.totalDamage}\n**Crits:** ${parsed.crits}\n**Hits:** ${parsed.hits}\n**Misses:** ${parsed.misses}`;
+
+                            await interaction.reply({ content: reply });
+                        } catch (err) {
+                            console.error("Failed to parse Python output:", err);
+                            await interaction.reply({ content: "Error running autoroller." });
+                        }
+                    });
                 }
             }
         }
